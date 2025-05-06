@@ -29,7 +29,7 @@ public class CompositeSpamFilter implements SpamFilter {
     @Override
     public boolean isSpam(Message message) {
 
-        if ( CheckUtils.checkValidMessage(message)) {
+        if (!CheckUtils.checkValidMessage(message)) {
             throw new MessageInvalidException();
         }
 

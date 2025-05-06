@@ -36,10 +36,6 @@ public class UserStorage {
         return user;
     }
 
-    public User getUserSafe(String userName) {
-        return users.get(userName);
-    }
-
     public boolean hasUser(String userName) {
         return users.containsKey(userName);
     }

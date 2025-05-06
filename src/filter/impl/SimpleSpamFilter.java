@@ -10,11 +10,11 @@ import java.util.regex.Pattern;
 
 public class SimpleSpamFilter implements SpamFilter {
 
-    public static final Pattern PATTERN = Pattern.compile("//bspam//b", Pattern.CASE_INSENSITIVE);
+    public static final Pattern PATTERN = Pattern.compile("\\bspam\\b", Pattern.CASE_INSENSITIVE);
 
     @Override
     public boolean isSpam(Message message) {
-        if ( CheckUtils.checkValidMessage(message)) {
+        if (!CheckUtils.checkValidMessage(message)) {
             throw new MessageInvalidException();
         }
         return PATTERN.matcher(message.getText()).find() ||

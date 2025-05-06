@@ -31,7 +31,7 @@ public class RepetitionSpamFilter implements SpamFilter {
 
         Map<String, Integer> wordCounts = new HashMap<>();
 
-        Pattern pattern = Pattern.compile("\\w+");
+        Pattern pattern = Pattern.compile("\\p{L}+", Pattern.UNICODE_CHARACTER_CLASS);
         Matcher matcher = pattern.matcher(text.toLowerCase());
 
         while (matcher.find()) {

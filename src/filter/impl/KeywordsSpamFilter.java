@@ -6,27 +6,22 @@ import model.Message;
 import utils.CheckUtils;
 
 import java.util.*;
-import java.util.regex.Pattern;
 
 public class KeywordsSpamFilter implements SpamFilter {
 
-    private final Map<String, Pattern> keywordPatterns;
+    private List<String> keywords;
 
     public KeywordsSpamFilter() {
-        keywordPatterns = new HashMap<>();
+        this.keywords = new ArrayList<>();
     }
 
     public void setKeywords(List<String> keywords) {
-        keywordPatterns.clear();
+        this.keywords = new ArrayList<>();
 
         if (keywords != null) {
             for (String keyword : keywords) {
                 if (keyword != null && !keyword.isEmpty()) {
-
-                    String lowerKeyword = keyword.toLowerCase();
-                    Pattern pattern = Pattern.compile("\\b" + Pattern.quote(lowerKeyword) + "\\b",
-                            Pattern.CASE_INSENSITIVE);
-                    this.keywordPatterns.put(lowerKeyword, pattern);
+                    this.keywords.add(keyword.toLowerCase());
                 }
             }
         }
@@ -34,23 +29,31 @@ public class KeywordsSpamFilter implements SpamFilter {
 
     @Override
     public boolean isSpam(Message message) {
-        if ( CheckUtils.checkValidMessage(message)) {
+        if (!CheckUtils.checkValidMessage(message)) {
             throw new MessageInvalidException();
         }
-        if (keywordPatterns.isEmpty()) {
+
+        if (keywords.isEmpty()) {
             return false;
         }
 
-        String text = message.getText();
-        String caption = message.getCaption();
-        for (Map.Entry<String, Pattern> entry : keywordPatterns.entrySet()) {
-            String keyword = entry.getKey();
-            Pattern pattern = entry.getValue();
+        String text = message.getText().toLowerCase();
+        String caption = message.getCaption().toLowerCase();
 
-            if (text.contains(keyword) || caption.contains(keyword)) {
-                if (pattern.matcher(caption).find() || pattern.matcher(text).find()) {
-                    return true;
-                }
+        for (String keyword : keywords) {
+            if (containsWord(text, keyword) || containsWord(caption, keyword)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean containsWord(String text, String word) {
+        String[] words = text.split("[\\s,.!?;:()\\[\\]{}\"']+");
+        for (String w : words) {
+            if (w.equals(word)) {
+                return true;
             }
         }
         return false;
