@@ -1,4 +1,4 @@
-package command;
+package console.command.impl;
 
 import console.command.Command;
 import console.command.impl.HelpCommand;

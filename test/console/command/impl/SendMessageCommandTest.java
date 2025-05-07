@@ -1,6 +1,6 @@
-package command;
+package console.command.impl;
 
-import console.command.impl.InboxCommand;
+import console.command.impl.SendMessageCommand;
 import model.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,21 +14,21 @@ import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class InboxCommandTest {
+public class SendMessageCommandTest {
 
     private UserStorage userStorage;
-    private User user;
     private User sender;
+    private User receiver;
     private ByteArrayOutputStream outputStream;
     private PrintStream originalOut;
 
     @BeforeEach
     void setUp() {
         userStorage = new UserStorage();
-        user = new User("TestUser");
         sender = new User("Sender");
-        userStorage.addUser(user);
+        receiver = new User("Receiver");
         userStorage.addUser(sender);
+        userStorage.addUser(receiver);
 
         originalOut = System.out;
         outputStream = new ByteArrayOutputStream();
@@ -41,40 +41,38 @@ public class InboxCommandTest {
     }
 
     @Test
-    void testInboxEmpty() {
-        String input = "TestUser\n";
+    void testSendMessage() {
+        String input = "Sender\nReceiver\nTest Subject\nTest Message\n";
         ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
         Scanner scanner = new Scanner(inputStream);
 
-        InboxCommand command = new InboxCommand(scanner, userStorage);
+        SendMessageCommand command = new SendMessageCommand(scanner, userStorage);
         command.execute();
 
-        assertTrue(outputStream.toString().contains("No messages in inbox"));
+        assertEquals(1, sender.getOutbox().size());
+        assertEquals(1, receiver.getInbox().size());
+        assertTrue(outputStream.toString().contains("Message sent"));
     }
 
     @Test
-    void testInboxWithMessages() {
-        sender.sendMessage("Test Subject", "Test Message", user);
-
-        String input = "TestUser\n";
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
-        Scanner scanner = new Scanner(inputStream);
-
-        InboxCommand command = new InboxCommand(scanner, userStorage);
-        command.execute();
-
-        String output = outputStream.toString();
-        assertTrue(output.contains("Test Subject"));
-        assertTrue(output.contains("Test Message"));
-    }
-
-    @Test
-    void testInboxUserNotFound() {
+    void testSenderNotFound() {
         String input = "NonExistentUser\n";
         ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
         Scanner scanner = new Scanner(inputStream);
 
-        InboxCommand command = new InboxCommand(scanner, userStorage);
+        SendMessageCommand command = new SendMessageCommand(scanner, userStorage);
+        command.execute();
+
+        assertTrue(outputStream.toString().contains("Error: User not found"));
+    }
+
+    @Test
+    void testReceiverNotFound() {
+        String input = "Sender\nNonExistentUser\n";
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
+        Scanner scanner = new Scanner(inputStream);
+
+        SendMessageCommand command = new SendMessageCommand(scanner, userStorage);
         command.execute();
 
         assertTrue(outputStream.toString().contains("Error: User not found"));
@@ -82,7 +80,7 @@ public class InboxCommandTest {
 
     @Test
     void testGetDescription() {
-        InboxCommand command = new InboxCommand(new Scanner(""), userStorage);
+        SendMessageCommand command = new SendMessageCommand(new Scanner(""), userStorage);
         assertNotNull(command.getDescription());
         assertFalse(command.getDescription().isEmpty());
     }

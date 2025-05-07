@@ -1,4 +1,4 @@
-package command;
+package console.command.impl;
 
 import console.command.impl.ListUsersCommand;
 import model.User;

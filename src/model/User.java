@@ -44,7 +44,7 @@ public class User {
         outbox.add(message);
 
         if (receiver != null) {
-            if (spamfilter != null && receiver.spamfilter.isSpam(message)) {
+            if (receiver.spamfilter != null && receiver.spamfilter.isSpam(message)) {
                 receiver.spam.add(message);
             } else {
                 receiver.inbox.add(message);

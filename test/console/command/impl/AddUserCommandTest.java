@@ -1,6 +1,6 @@
-package command;
+package console.command.impl;
 
-import console.command.impl.SetFilterCommand;
+import console.command.impl.AddUserCommand;
 import model.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,22 +14,15 @@ import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SetFilterCommandTest {
+public class AddUserCommandTest {
 
     private UserStorage userStorage;
-    private User user;
-    private User spamSender;
     private ByteArrayOutputStream outputStream;
     private PrintStream originalOut;
 
     @BeforeEach
     void setUp() {
         userStorage = new UserStorage();
-        user = new User("TestUser");
-        spamSender = new User("SpamSender");
-        userStorage.addUser(user);
-        userStorage.addUser(spamSender);
-
         originalOut = System.out;
         outputStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStream));
@@ -41,32 +34,37 @@ public class SetFilterCommandTest {
     }
 
     @Test
-    void testUserNotFound() {
-        String input = "NonExistentUser\n";
+    void testAddNewUser() {
+        String input = "TestUser\n";
         ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
         Scanner scanner = new Scanner(inputStream);
 
-        SetFilterCommand command = new SetFilterCommand(scanner, userStorage);
+        AddUserCommand command = new AddUserCommand(scanner, userStorage);
         command.execute();
 
-        assertTrue(outputStream.toString().contains("Error: User not found"));
+        assertTrue(userStorage.hasUser("TestUser"));
+        assertEquals(1, userStorage.getUserCount());
+        assertTrue(outputStream.toString().contains("User 'TestUser' added"));
     }
 
     @Test
-    void testInvalidFilterType() {
-        String input = "TestUser\ninvalidFilter\ndone\n";
+    void testAddExistingUser() {
+        userStorage.addUser(new User("ExistingUser"));
+
+        String input = "ExistingUser\n";
         ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes());
         Scanner scanner = new Scanner(inputStream);
 
-        SetFilterCommand command = new SetFilterCommand(scanner, userStorage);
+        AddUserCommand command = new AddUserCommand(scanner, userStorage);
         command.execute();
 
-        assertTrue(outputStream.toString().contains("Unknown filter type"));
+        assertEquals(1, userStorage.getUserCount());
+        assertTrue(outputStream.toString().contains("User 'ExistingUser' already exists"));
     }
 
     @Test
     void testGetDescription() {
-        SetFilterCommand command = new SetFilterCommand(new Scanner(""), userStorage);
+        AddUserCommand command = new AddUserCommand(new Scanner(""), userStorage);
         assertNotNull(command.getDescription());
         assertFalse(command.getDescription().isEmpty());
     }

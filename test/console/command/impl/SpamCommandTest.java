@@ -1,4 +1,4 @@
-package command;
+package console.command.impl;
 
 import console.command.impl.SpamCommand;
 import filter.impl.SimpleSpamFilter;

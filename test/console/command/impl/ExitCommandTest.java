@@ -1,4 +1,4 @@
-package command;
+package console.command.impl;
 
 import console.command.impl.ExitCommand;
 import org.junit.jupiter.api.AfterEach;
