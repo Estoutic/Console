@@ -22,7 +22,6 @@ public class CommandFactoryTest {
 
     @Test
     void testGetExistingCommand() {
-        // Проверка команды add
         Command command = commandFactory.getCommand("add");
         assertNotNull(command);
         assertTrue(command instanceof AddUserCommand);
