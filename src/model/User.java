@@ -41,13 +41,13 @@ public class User {
 
     public void sendMessage(String caption, String text, User receiver) {
         Message message = new Message(caption, text, this, receiver);
-        inbox.add(message);
+        outbox.add(message);
 
         if (receiver != null) {
-            if (spamfilter != null && !receiver.spamfilter.isSpam(message)) {
-                receiver.inbox.add(message);
-            } else {
+            if (spamfilter != null && receiver.spamfilter.isSpam(message)) {
                 receiver.spam.add(message);
+            } else {
+                receiver.inbox.add(message);
             }
         }
     }

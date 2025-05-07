@@ -38,11 +38,9 @@ public class SenderSpamFilterTest {
 
     @Test
     void testAddMultipleSpamSenders() {
-        // Создаем еще одного спам-отправителя
         User anotherSpamSender = new User("AnotherSpamUser");
         filter.addUser(anotherSpamSender.getUserName());
 
-        // Проверяем оба спам-отправителя
         Message message1 = new Message("Заголовок", "Сообщение от первого спам-отправителя", spamSender, receiver);
         Message message2 = new Message("Заголовок", "Сообщение от второго спам-отправителя", anotherSpamSender, receiver);
 

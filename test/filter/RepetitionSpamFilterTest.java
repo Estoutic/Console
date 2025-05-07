@@ -14,8 +14,8 @@ public class RepetitionSpamFilterTest {
 
     @BeforeEach
     void setUp() {
-        sender = new User("Vasya");
-        receiver = new User("Petya");
+        sender = new User("Vladimir");
+        receiver = new User("Egor");
     }
 
     @Test
