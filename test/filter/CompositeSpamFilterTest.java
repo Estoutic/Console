@@ -10,75 +10,65 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CompositeSpamFilterTest {
-
-    private CompositeSpamFilter compositeFilter;
-    private SimpleSpamFilter simpleFilter;
-    private KeywordsSpamFilter keywordsFilter;
-    private User sender;
-    private User receiver;
+    CompositeSpamFilter filter;
+    SimpleSpamFilter simple;
+    KeywordsSpamFilter keywords;
+    User sender;
+    User recipient;
 
     @BeforeEach
-    void setUp() {
-        compositeFilter = new CompositeSpamFilter();
-        simpleFilter = new SimpleSpamFilter();
-        keywordsFilter = new KeywordsSpamFilter();
-        sender = new User("Vladimir");
-        receiver = new User("Egor");
+    void setup() {
+        filter = new CompositeSpamFilter();
+        simple = new SimpleSpamFilter();
+        keywords = new KeywordsSpamFilter();
 
-        keywordsFilter.setKeywords(java.util.Arrays.asList("гараж", "продам"));
+        sender = new User("Вася");
+        recipient = new User("Петя");
+
+        keywords.setKeywords(java.util.Arrays.asList("гараж", "продам"));
     }
 
     @Test
-    void testEmptyCompositeFilter() {
-        Message message = new Message("Заголовок", "Обычное сообщение", sender, receiver);
-        assertFalse(compositeFilter.isSpam(message));
+    void testEmptyFilter() {
+        Message msg = new Message("Привет", "Как дела?", sender, recipient);
+
+        assertFalse(filter.isSpam(msg));
     }
 
     @Test
-    void testSimpleFilterOnly() {
-        compositeFilter.addFilter(simpleFilter);
+    void testSimpleFilter() {
+        filter.addFilter(simple);
 
-        Message normalMessage = new Message("Заголовок", "Обычное сообщение", sender, receiver);
-        assertFalse(compositeFilter.isSpam(normalMessage));
+        Message normal = new Message("Привет", "Обычное сообщение", sender, recipient);
+        assertFalse(filter.isSpam(normal));
 
-        Message spamMessage = new Message("Заголовок", "Сообщение со словом spam", sender, receiver);
-        assertTrue(compositeFilter.isSpam(spamMessage));
+        Message spam = new Message("Тема", "Это spam сообщение", sender, recipient);
+        assertTrue(filter.isSpam(spam));
     }
 
     @Test
-    void testKeywordsFilterOnly() {
-        compositeFilter.addFilter(keywordsFilter);
+    void testKeywordsFilter() {
+        filter.addFilter(keywords);
 
-        Message normalMessage = new Message("Заголовок", "Обычное сообщение", sender, receiver);
-        assertFalse(compositeFilter.isSpam(normalMessage));
+        Message spam = new Message("Объявление", "Продам велосипед", sender, recipient);
+        assertTrue(filter.isSpam(spam));
 
-        Message spamMessage = new Message("Заголовок", "Продам велосипед", sender, receiver);
-        assertTrue(compositeFilter.isSpam(spamMessage));
+        Message normal = new Message("Привет", "Как дела?", sender, recipient);
+        assertFalse(filter.isSpam(normal));
     }
 
     @Test
-    void testMultipleFilters() {
-        compositeFilter.addFilter(simpleFilter);
-        compositeFilter.addFilter(keywordsFilter);
+    void testBothFilters() {
+        filter.addFilter(simple);
+        filter.addFilter(keywords);
 
-        Message normalMessage = new Message("Заголовок", "Обычное сообщение", sender, receiver);
-        assertFalse(compositeFilter.isSpam(normalMessage));
+        Message spam1 = new Message("Тема", "Это spam", sender, recipient);
+        assertTrue(filter.isSpam(spam1));
 
-        Message spamForSimple = new Message("Заголовок", "Сообщение со словом spam", sender, receiver);
-        assertTrue(compositeFilter.isSpam(spamForSimple));
+        Message spam2 = new Message("Тема", "Продам машину", sender, recipient);
+        assertTrue(filter.isSpam(spam2));
 
-        Message spamForKeywords = new Message("Заголовок", "Продам велосипед", sender, receiver);
-        assertTrue(compositeFilter.isSpam(spamForKeywords));
-    }
-
-    @Test
-    void testAddFilters() {
-        compositeFilter.addFilters(simpleFilter, keywordsFilter);
-
-        Message spamForSimple = new Message("Заголовок", "Сообщение со словом spam", sender, receiver);
-        assertTrue(compositeFilter.isSpam(spamForSimple));
-
-        Message spamForKeywords = new Message("Заголовок", "Продам велосипед", sender, receiver);
-        assertTrue(compositeFilter.isSpam(spamForKeywords));
+        Message normal = new Message("Привет", "Как дела?", sender, recipient);
+        assertFalse(filter.isSpam(normal));
     }
 }

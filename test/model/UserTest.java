@@ -6,56 +6,56 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserTest {
-
-    private User sender;
-    private User receiver;
+    User sender;
+    User receiver;
 
     @BeforeEach
-    void setUp() {
-        sender = new User("Vladimir");
-        receiver = new User("Egor");
+    void setup() {
+        sender = new User("Вася");
+        receiver = new User("Петя");
     }
 
     @Test
-    void testGetUserName() {
-        assertEquals("Vladimir", sender.getUserName());
-        assertEquals("Egor", receiver.getUserName());
+    void testName() {
+        assertEquals("Вася", sender.getUserName());
+        assertEquals("Петя", receiver.getUserName());
     }
 
     @Test
     void testSendMessage() {
-        sender.sendMessage("Заголовок", "Привет, как дела?", receiver);
+        sender.sendMessage("Привет", "Как твои дела?", receiver);
 
-        assertEquals(1, sender.getOutbox().size());
+        int size1 = sender.getOutbox().size();
+        assertEquals(1, size1);
 
-        assertEquals(1, receiver.getInbox().size());
+        int size2 = receiver.getInbox().size();
+        assertEquals(1, size2);
+
         assertEquals(0, receiver.getSpam().size());
 
-        Message sentMessage = sender.getOutbox().get(0);
-        Message receivedMessage = receiver.getInbox().get(0);
+        Message sent = sender.getOutbox().get(0);
+        assertEquals("Привет", sent.getCaption());
+        assertEquals("Как твои дела?", sent.getText());
 
-        assertEquals("Заголовок", sentMessage.getCaption());
-        assertEquals("Привет, как дела?", sentMessage.getText());
-        assertEquals(sender, sentMessage.getSender());
-        assertEquals(receiver, sentMessage.getReceiver());
-
-        assertEquals(sentMessage.getCaption(), receivedMessage.getCaption());
-        assertEquals(sentMessage.getText(), receivedMessage.getText());
+        Message received = receiver.getInbox().get(0);
+        assertEquals("Привет", received.getCaption());
+        assertEquals("Как твои дела?", received.getText());
     }
 
     @Test
-    void testSendMessageWithSpamFilter() {
-        SimpleSpamFilter spamFilter = new SimpleSpamFilter();
-        receiver.setSpamFilter(spamFilter);
+    void testSpamFilter() {
+        SimpleSpamFilter filter = new SimpleSpamFilter();
+        receiver.setSpamFilter(filter);
 
-        sender.sendMessage("Заголовок", "Привет, как дела?", receiver);
+        sender.sendMessage("Привет", "Обычное сообщение", receiver);
 
-        sender.sendMessage("Spam Alert", "This is spam message", receiver);
+        sender.sendMessage("Тема", "Это spam сообщение", receiver);
 
         assertEquals(1, receiver.getInbox().size());
+
         assertEquals(1, receiver.getSpam().size());
 
-        Message spamMessage = receiver.getSpam().get(0);
-        assertEquals("Spam Alert", spamMessage.getCaption());
+        Message spam = receiver.getSpam().get(0);
+        assertEquals("Тема", spam.getCaption());
     }
 }

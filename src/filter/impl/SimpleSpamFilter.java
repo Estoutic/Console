@@ -5,7 +5,6 @@ import filter.SpamFilter;
 import model.Message;
 import utils.CheckUtils;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SimpleSpamFilter implements SpamFilter {

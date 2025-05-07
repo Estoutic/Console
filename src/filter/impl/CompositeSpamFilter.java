@@ -6,25 +6,18 @@ import model.Message;
 import utils.CheckUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class CompositeSpamFilter implements SpamFilter {
+    private final List<SpamFilter> filterList;
 
     public CompositeSpamFilter() {
-        this.filters = new ArrayList<>();
-    }
-
-    private final List<SpamFilter> filters;
-
-    public void addFilters(SpamFilter... filters) {
-        this.filters.addAll(Arrays.asList(filters));
+        filterList = new ArrayList<>();
     }
 
     public void addFilter(SpamFilter filter) {
-        this.filters.add(filter);
+        filterList.add(filter);
     }
-
 
     @Override
     public boolean isSpam(Message message) {
@@ -33,11 +26,13 @@ public class CompositeSpamFilter implements SpamFilter {
             throw new MessageInvalidException();
         }
 
-        for (SpamFilter filter : filters) {
-            if (filter.isSpam(message)) {
+        for (int i = 0; i < filterList.size(); i++) {
+            SpamFilter currentFilter = filterList.get(i);
+            if (currentFilter.isSpam(message)) {
                 return true;
             }
         }
+
         return false;
     }
 }

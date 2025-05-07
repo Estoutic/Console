@@ -61,7 +61,7 @@ public class CommandFactoryTest {
 
     @Test
     void testGetUnknownCommand() {
-        Command command = commandFactory.getCommand("nonexistent");
+        Command command = commandFactory.getCommand("test");
         assertNotNull(command);
         assertTrue(command instanceof UnknownCommand);
     }

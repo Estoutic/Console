@@ -8,39 +8,65 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SimpleSpamFilterTest {
-
-    private SimpleSpamFilter filter;
-    private User sender;
-    private User receiver;
+    SimpleSpamFilter filter;
+    User user1, user2;
 
     @BeforeEach
-    void setUp() {
+    void setup() {
         filter = new SimpleSpamFilter();
-        sender = new User("Vladimir");
-        receiver = new User("Egor");
+        user1 = new User("Вася");
+        user2 = new User("Петя");
     }
 
     @Test
-    void testNonSpamMessage() {
-        Message message = new Message("Заголовок", "Обычное сообщение", sender, receiver);
-        assertFalse(filter.isSpam(message));
+    void testNormal() {
+        Message msg = new Message(
+                "Привет",
+                "Как дела?",
+                user1,
+                user2
+        );
+
+        boolean result = filter.isSpam(msg);
+        assertFalse(result);
     }
 
     @Test
     void testSpamInText() {
-        Message message = new Message("Заголовок", "Это сообщение содержит слово spam", sender, receiver);
-        assertTrue(filter.isSpam(message));
+        Message msg = new Message(
+                "Тема",
+                "Это spam сообщение",
+                user1,
+                user2
+        );
+
+        boolean result = filter.isSpam(msg);
+        assertTrue(result);
     }
 
     @Test
     void testSpamInCaption() {
-        Message message = new Message("SPAM Alert", "Обычное сообщение", sender, receiver);
-        assertTrue(filter.isSpam(message));
+        Message msg = new Message(
+                "Spam alert",
+                "Обычный текст",
+                user1,
+                user2
+        );
+
+        boolean result = filter.isSpam(msg);
+        assertTrue(result);
     }
 
     @Test
-    void testCaseInsensitivity() {
-        Message message = new Message("Заголовок", "Это сообщение содержит слово SpAm", sender, receiver);
-        assertTrue(filter.isSpam(message));
+    void testCase() {
+        Message msg = new Message(
+                "Тема",
+                "Это SPAM сообщение",
+                user1,
+                user2
+        );
+
+        boolean result = filter.isSpam(msg);
+        assertTrue(result);
     }
 }
