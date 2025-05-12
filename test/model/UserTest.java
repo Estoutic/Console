@@ -11,14 +11,14 @@ public class UserTest {
 
     @BeforeEach
     void setup() {
-        sender = new User("Вася");
-        receiver = new User("Петя");
+        sender = new User("Vladimir");
+        receiver = new User("Egor");
     }
 
     @Test
     void testName() {
-        assertEquals("Вася", sender.getUserName());
-        assertEquals("Петя", receiver.getUserName());
+        assertEquals("Vladimir", sender.getUserName());
+        assertEquals("Egor", receiver.getUserName());
     }
 
     @Test

@@ -14,8 +14,8 @@ public class SimpleSpamFilterTest {
     @BeforeEach
     void setup() {
         filter = new SimpleSpamFilter();
-        user1 = new User("Вася");
-        user2 = new User("Петя");
+        user1 = new User("Vladimir");
+        user2 = new User("Egor");
     }
 
     @Test

@@ -22,8 +22,8 @@ public class CompositeSpamFilterTest {
         simple = new SimpleSpamFilter();
         keywords = new KeywordsSpamFilter();
 
-        sender = new User("Вася");
-        recipient = new User("Петя");
+        sender = new User("Vladimir");
+        recipient = new User("Egor");
 
         keywords.setKeywords(java.util.Arrays.asList("гараж", "продам"));
     }
